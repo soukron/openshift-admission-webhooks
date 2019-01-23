@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Template
+metadata: {}
+parameters:
+- name: WEBHOOK_NAME
+  required: true
+  description: Name of the webhook (default value is denynewpods).
+  value: denynewpods
+- name: WEBHOOK_NAMESPACE
+  required: true
+  description: Name of the project where the webhook is being deployed.
+- name: WEBHOOK_CA_BUNDLE
+  required: true
+  description: Content of /etc/origin/master/service-signer.crt base64 encoded or the CA which signed the certificate used in the webhook.
+objects:
+- apiVersion: admissionregistration.k8s.io/v1beta1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    labels:
+      webhook: ${WEBHOOK_NAME}
+    name: ${WEBHOOK_NAME}
+  webhooks:
+  - name: ${WEBHOOK_NAME}.admission.online.openshift.io
+    rules:
+    - operations:
+      - CREATE
+      apiGroups:
+      - "*"
+      apiVersions:
+      - "*"
+      resources:
+      - pods
+    failurePolicy: Fail
+    clientConfig:
+      url: https://${WEBHOOK_NAME}.${WEBHOOK_NAMESPACE}.svc
+      path: /
+      caBundle: ${WEBHOOK_CA_BUNDLE}
+    namespaceSelector:
+      matchLabels:
+        denynewpods.admission.online.openshift.io: enabled

@@ -10,7 +10,10 @@
   "author": "Sergio G. <soukron@gmbros.net>",
   "license": "GPL",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "express": "^4.14.0",
-    "morgan": "^1.8.2",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
+    "morgan": "^1.8.2"
   }
 }
