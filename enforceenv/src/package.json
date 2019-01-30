@@ -1,0 +1,20 @@
+{
+  "name": "enforceenv",
+  "version": "0.0.1",
+  "description": "Example of a Webhook Server to be used as a Mutating Admission Webhook",
+  "private": true,
+  "main": "app.js",
+  "scripts": {
+    "start": "node --use_strict app.js"
+  },
+  "author": "Sergio G. <soukron@gmbros.net>",
+  "license": "GPL",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.14.0",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
+    "morgan": "^1.8.2",
+    "request": "^2.88.0"
+  }
+}

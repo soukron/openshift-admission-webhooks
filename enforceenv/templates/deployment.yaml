@@ -4,8 +4,8 @@ metadata: {}
 parameters:
 - name: WEBHOOK_NAME
   required: true
-  description: Name of the webhook to deploy (defaults to denynewpods)
-  value: denynewpods
+  description: Name of the webhook to deploy (default value is enforceenv)
+  value: enforceenv
 objects:
 - apiVersion: v1
   kind: BuildConfig
