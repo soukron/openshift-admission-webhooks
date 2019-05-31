@@ -56,10 +56,19 @@ router.post('/', (req, res) => {
         }));
         
         // generate patch
-        var jsonPatch=[{"op": "replace", "path": "/object/spec/containers/0/env", "value": podenv}];
+        var jsonPatch='{"op": "replace", "path": "/object/spec/containers/0/env", "value": '+podenv+'}';
         console.log(jsonPatch);
 
         // TODO: generate the admissionResponse object and return it
+        var admissionResponse = {
+          response: {
+            uid: req.body.request.uid,
+            allowed: true,
+            patch: jsonPatch
+          }
+        };
+        console.log(admissionResponse);
+        res.send(JSON.stringify(admissionResponse));
       }
       res.status(200).end();
     }
