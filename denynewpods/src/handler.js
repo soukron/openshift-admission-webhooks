@@ -9,6 +9,10 @@ router.post('/', (req, res) => {
   // set the proper header
   res.setHeader('Content-Type', 'application/json');
 
+  // show the request body
+  console.log('DEBUG: Request Body', req.body);
+  console.log('DEBUG: Object', req.body.request.object);
+
   // send the denying response
   res.send(JSON.stringify({
     response: {
