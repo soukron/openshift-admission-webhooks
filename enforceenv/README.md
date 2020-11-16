@@ -77,7 +77,7 @@ $ oc run env --restart=Never --attach=true --rm=true \
 ## Cleanup
 Delete the Admission Webhook and then all resources labeled with the name of the Webhook Server:
 ~~~
-$ oc delete validatingwebhookconfiguration enforceenv
+$ oc delete mutatingwebhookconfiguration enforceenv
 $ oc delete all -n webhooks -l webhook=enforceenv
 ~~~
 
