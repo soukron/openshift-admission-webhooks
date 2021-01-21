@@ -13,6 +13,7 @@ There are two types of Admission Webhook objects you can configure:
 - _Validating Admission Webhooks_ allow for the use of validating webhooks to enforce custom admission policies.
 
 ## Enabling Admission Webhooks
+### OpenShift 3.x
 In order to use these _Mutating Admission Webhooks_ and _Validating Admission Webhooks_ they must be activated in OpenShift master services.
 
 Make sure that `/etc/origin/master/master-config.yaml` has this two plugins enabled in `admissionConfig.pluginConfig` section, and restart master services:
@@ -29,6 +30,9 @@ Make sure that `/etc/origin/master/master-config.yaml` has this two plugins enab
         kind: DefaultAdmissionConfig
 ~~~
 
+### OpenShift 4.x
+No need to perform any change, the _Admission Webhooks_ are enabled by default.
+
 ## List of Webhooks Servers
 This is the list of the Webhook Servers included in the repository:
 - __[denynewpods](./denynewpods/README.md)__. This webhook is an example of a _Validating Admission Webhook_ and will prevent to run any kind of pod in a namespace labeled with the label `denynewpods.admission.online.openshift.io` to a value `enabled`.
@@ -39,7 +43,7 @@ All Webhook Servers in this repository:
 - are built using OpenShift build methods.
 - listen in port 8443 for HTTPS (POST) requests.
 - use the Service Signer CA to get a secret with a certificate and a key. You should be able to overwrite the content of the secret after its creation if you want to use your own CA and certificates.
-- are referred using their service DNS name. Other methods can be used like integrating the service in OpenShift API, using a service and namespace reference or even a secured route.
+- are referred using their service name and namespace reference. Other methods can be used like integrating the service in OpenShift API, using a service DNS name (for externally hosted webhooks) or even a secured route.
 
 Refer to each Webhook Server's README file to get more details about it.
 

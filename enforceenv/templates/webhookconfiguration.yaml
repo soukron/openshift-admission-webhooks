@@ -11,7 +11,7 @@ parameters:
   description: Name of the project where the webhook is being deployed.
 - name: WEBHOOK_CA_BUNDLE
   required: true
-  description: Content of /etc/origin/master/service-signer.crt base64 encoded or the CA which signed the certificate used in the webhook.
+  description: Base64 encoded CA which signed the certificate used in the webhook.
 objects:
 - apiVersion: admissionregistration.k8s.io/v1beta1
   kind: MutatingWebhookConfiguration
@@ -31,6 +31,7 @@ objects:
       resources:
       - pods
     clientConfig:
-      url: https://${WEBHOOK_NAME}.${WEBHOOK_NAMESPACE}.svc
-      path: /
+      service:
+        name: ${WEBHOOK_NAME}
+        namespace: ${WEBHOOK_NAMESPACE}
       caBundle: ${WEBHOOK_CA_BUNDLE}

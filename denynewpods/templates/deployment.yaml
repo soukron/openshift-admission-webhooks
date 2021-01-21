@@ -4,8 +4,11 @@ metadata: {}
 parameters:
 - name: WEBHOOK_NAME
   required: true
-  description: Name of the webhook to deploy (defaults to denynewpods)
+  description: Name of the webhook (defaults to denynewpods).
   value: denynewpods
+- name: WEBHOOK_NAMESPACE
+  required: true
+  description: Name of the project where the webhook is being deployed.
 objects:
 - apiVersion: v1
   kind: BuildConfig
@@ -13,6 +16,7 @@ objects:
     labels:
       webhook: ${WEBHOOK_NAME}
     name: ${WEBHOOK_NAME}
+    namespace: ${WEBHOOK_NAMESPACE}
   spec:
     output:
       to:
@@ -37,6 +41,7 @@ objects:
     labels:
       webhook: ${WEBHOOK_NAME}
     name: ${WEBHOOK_NAME}
+    namespace: ${WEBHOOK_NAMESPACE}
   spec:
     lookupPolicy:
       local: false
@@ -55,6 +60,7 @@ objects:
     labels:
       webhook: ${WEBHOOK_NAME}
     name: ${WEBHOOK_NAME}
+    namespace: ${WEBHOOK_NAMESPACE}
   spec:
     ports:
     - name: 443-tcp
@@ -71,6 +77,7 @@ objects:
     labels:
       webhook: ${WEBHOOK_NAME}
     name: ${WEBHOOK_NAME}
+    namespace: ${WEBHOOK_NAMESPACE}
   spec:
     replicas: 1
     selector:

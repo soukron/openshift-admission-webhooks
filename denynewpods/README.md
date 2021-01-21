@@ -22,7 +22,8 @@ $ curl -k -X POST https://denynewpods.webhooks.svc
 ### Creating the Webhook Server
 ~~~
 $ oc new-project webhooks
-$ oc process -f https://raw.githubusercontent.com/soukron/openshift-admission-webhooks/master/denynewpods/templates/deployment.yaml \
+$ oc process -p WEBHOOK_NAMESPACE=webhooks \
+     -f https://raw.githubusercontent.com/soukron/openshift-admission-webhooks/master/denynewpods/templates/deployment.yaml \
   | oc apply -f -
 $ oc start-build bc/denynewpods
 ~~~
@@ -32,8 +33,18 @@ $ oc start-build bc/denynewpods
 The Admission Webhook will trigger the Webhook Server when a new pod is created in a namespace labeled with the label `denynewpods.admission.online.openshift.io` to a value `enabled`.
 
 ### Creating the Admission Webhook
+#### OpenShift 3.x
 ~~~
 $ export WEBHOOK_CA_BUNDLE=$( sudo cat /etc/origin/master/service-signer.crt | base64 -w0 )
+$ oc process -p WEBHOOK_NAMESPACE=webhooks \
+     -p WEBHOOK_CA_BUNDLE=${WEBHOOK_CA_BUNDLE} \
+     -f https://raw.githubusercontent.com/soukron/openshift-admission-webhooks/master/denynewpods/templates/webhookconfiguration.yaml \
+  | oc apply -f -
+~~~
+
+#### OpenShift 4.x
+~~~
+$ export WEBHOOK_CA_BUNDLE=$( oc get configmap -n openshift-network-operator openshift-service-ca -o jsonpath='{.data.service-ca\.crt}' | base64 -w0 )
 $ oc process -p WEBHOOK_NAMESPACE=webhooks \
      -p WEBHOOK_CA_BUNDLE=${WEBHOOK_CA_BUNDLE} \
      -f https://raw.githubusercontent.com/soukron/openshift-admission-webhooks/master/denynewpods/templates/webhookconfiguration.yaml \
@@ -64,26 +75,26 @@ $ oc process -p WEBHOOK_NAMESPACE=webhooks \
 After the Webhook Server is deployed and the Admission Webhook has been created, try to create a new project and run a pod on it:
 ~~~
 $ oc new-project test-webhooks
-$ oc run sleep --image=alpine --command -- sleep 3600
+$ oc run sleep-1 --image=alpine --command -- sleep 3600
 ~~~
 This first pod will run successfully as the namespace is not yet labeled. 
 
-Add the label to the namespace and try to increase the number of replicas:
+Add the label to the namespace and try to run another pod:
 ~~~
 $ oc label namespace test-webhooks denynewpods.admission.online.openshift.io=enabled
-$ oc scale dc/sleep --replicas=5
+$ oc run sleep-2 --image=alpine --command -- sleep 3600
 ~~~
 
-No new pods will be scheduled and a log will appear in the events:
+No new pods will be scheduled and an error will be returned:
 ~~~
-$ oc get events | grep admission
-5m          5m           1         sleep-1.157e7b51cdc8c0fc          ReplicationController                                 Warning   FailedCreate                  replication-controller                    Error creating: admission webhook "denynewpods.admission.online.openshift.io" denied the request: New pods denied.
+$ oc run sleep-2 --image=alpine --command -- sleep 3600
+Error from server (No new pods allowed in this project): admission webhook "denynewpods.admission.online.openshift.io" denied the request: New pods denied
 ~~~
 
 Remove the label to the namespace and this time the replicas will run:
 ~~~
 $ oc label namespace test-webhooks denynewpods.admission.online.openshift.io-
-$ oc scale dc/sleep --replicas=5
+$ oc run sleep-2 --image=alpine --command -- sleep 3600
 ~~~
 
 ## Cleanup

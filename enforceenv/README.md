@@ -11,7 +11,8 @@ The Webhook Server will:
 ### Creating the Webhook Server
 ~~~
 $ oc new-project webhooks
-$ oc process -f https://raw.githubusercontent.com/soukron/openshift-admission-webhooks/master/enforceenv/templates/deployment.yaml \
+$ oc process -p WEBHOOK_NAMESPACE=webhooks \
+     -f https://raw.githubusercontent.com/soukron/openshift-admission-webhooks/master/enforceenv/templates/deployment.yaml \
   | oc apply -f -
 $ oc start-build bc/enforceenv
 ~~~
@@ -21,8 +22,18 @@ $ oc start-build bc/enforceenv
 The Admission Webhook will trigger the Webhook Server when a new pod is created in a namespace labeled with the label `enforceenv.admission.online.openshift.io` is set.
 
 ### Creating the Admission Webhook
+#### OpenShift 3.x
 ~~~
 $ export WEBHOOK_CA_BUNDLE=$( sudo cat /etc/origin/master/service-signer.crt | base64 -w0 )
+$ oc process -p WEBHOOK_NAMESPACE=webhooks \
+     -p WEBHOOK_CA_BUNDLE=${WEBHOOK_CA_BUNDLE} \
+     -f https://raw.githubusercontent.com/soukron/openshift-admission-webhooks/master/enforceenv/templates/webhookconfiguration.yaml \
+  | oc apply -f -
+~~~
+
+#### OpenShift 4.x
+~~~
+$ export WEBHOOK_CA_BUNDLE=$( oc get configmap -n openshift-network-operator openshift-service-ca -o jsonpath='{.data.service-ca\.crt}' | base64 -w0 )
 $ oc process -p WEBHOOK_NAMESPACE=webhooks \
      -p WEBHOOK_CA_BUNDLE=${WEBHOOK_CA_BUNDLE} \
      -f https://raw.githubusercontent.com/soukron/openshift-admission-webhooks/master/enforceenv/templates/webhookconfiguration.yaml \
